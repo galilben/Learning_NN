@@ -32,8 +32,8 @@ def play(model):
     print("Hello to u player\nhere is my tictactoe random game \nsay bye if you are done")
     player_choise=""
     board=np.zeros(9)
+    moves=[]
     while player_choise!="bye":
-        moves=[]
         print_board(board)
         player_choise=input("your choise ->")
         if(not is_number(player_choise)):
@@ -45,11 +45,11 @@ def play(model):
                     print("illigle choise :(")
                 else:
                     board[choise]=1
-                    moves.append(board)
+                    moves.append((board,choise,1))
                     if(check_winner(board)!=0):
                         print(f"You win!!")
-                        # model.adjust_model(moves,1) #real time learn from games
-
+                        model.adjust_loss(moves,1) #real time learn from games
+                        moves=[]
                         board=np.zeros(9)
                     elif(np.all(board!=0)):
                         print("its a draw")
@@ -57,12 +57,13 @@ def play(model):
                     else:
                         ai = model.ai_move(board)
                         board[ai] = -1
-                        moves.append(board)
+                        moves.append((board,ai,-1))
                         print("AI played:", ai)
                         if(check_winner(board)!=0):
                             print(f"You lose!!")
                             board=np.zeros(9)
-                            # model.adjust_model(moves,-1) #real time learn from games
+                            model.adjust_model(moves,-1) #real time learn from games
+                            moves=[]
             else:
                 print("choises 0->9 or bye")
 
