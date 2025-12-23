@@ -3,6 +3,7 @@ global board
 global wins 
 wins=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]
 board=np.zeros(9)
+
 def print_board(state):
     print(f"|{state[0]}||{state[1]}||{state[2]}|")
     print(f"|{state[3]}||{state[4]}||{state[5]}|")
@@ -32,3 +33,8 @@ def check_winner(state):
         if state[w[1]]==state[w[0]]==state[w[2]] and state[w[0]]!=0:
             return state[w[0]]
     return 0
+
+def random_move(state):
+    options=np.where(state==0)[0]
+    return np.random.choice(options)
+

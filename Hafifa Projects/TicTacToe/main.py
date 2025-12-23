@@ -2,9 +2,8 @@ import tensorflow
 from GameFunctions import *
 from tensorflow import keras
 import numpy as np
-from TicTacToe.training import *
-
-
+from training import *
+from model import *
 
 #create a data set of games-> save all winning games only to calculate in network best winning not drawing moves
 def Get_db():
@@ -25,51 +24,16 @@ def Get_db():
 
 
 #call model to get a result
-def ai_move(board):
-    board = board.astype(np.float32)
-    probs = model(tensorflow.expand_dims(board, axis=0))[0].numpy()
-
-    # mask illegal moves
-    probs[board != 0] = 0
-
-    if probs.sum() == 0:
-        return random_move(board)
-
-    return np.argmax(probs)
-
-#basic loss function?
-loss_fn=keras.losses.SparseCategoricalCrossentropy(from_logits=True)
-
-#passing with 2 hiddens? 64 8*8 which is the number of max options squered
-model = keras.Sequential([
-    keras.layers.Input(shape=(9,)),  #9 inputs -> 1 for each space
-    keras.layers.Dense(64, activation='relu'), #64 hidden layers-> 
-    keras.layers.Dense(64, activation='relu'), #second hidden layer
-    keras.layers.Dense(9, activation='softmax') # 9 output options to show the odds of each move
-])
 
 
-
-
-
-model.compile(optimizer='adam',
-              loss='categorical_crossentropy',
-              metrics=['accuracy'])
-
-#model.fit -> give data to model and train it on that data
-X,Y=Get_db()
-model.fit(X, Y, epochs=25, batch_size=32)
-
-
-
-def play():
+def play(model):
     global board
 
     print("Hello to u player\nhere is my tictactoe random game \nsay bye if you are done")
     player_choise=""
     board=np.zeros(9)
     while player_choise!="bye":
-        
+        moves=[]
         print_board(board)
         player_choise=input("your choise ->")
         if(not is_number(player_choise)):
@@ -81,20 +45,29 @@ def play():
                     print("illigle choise :(")
                 else:
                     board[choise]=1
+                    moves.append(board)
                     if(check_winner(board)!=0):
                         print(f"You win!!")
+                        # model.adjust_model(moves,1) #real time learn from games
+
                         board=np.zeros(9)
                     elif(np.all(board!=0)):
                         print("its a draw")
                         board=np.zeros(9)
                     else:
-                        ai = ai_move(board)
-                        board[ai] = 2
+                        ai = model.ai_move(board)
+                        board[ai] = -1
+                        moves.append(board)
                         print("AI played:", ai)
                         if(check_winner(board)!=0):
                             print(f"You lose!!")
                             board=np.zeros(9)
+                            # model.adjust_model(moves,-1) #real time learn from games
             else:
                 print("choises 0->9 or bye")
-play()
+
+
+model=model_tic_tac_toe()
+training(model=model)
+play(model)
 

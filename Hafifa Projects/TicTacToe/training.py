@@ -1,8 +1,5 @@
 from GameFunctions import *
-def random_move(state):
-    options=np.where(state==0)[0]
-    return np.random.choice(options)
-
+import tensorflow
 
 def train_with_random_game():
     board = np.zeros(9)
@@ -18,4 +15,36 @@ def train_with_random_game():
             return boards_seen, moves, player
         player =player^1^2
     return 0,0,0 #in case of draw doesnt matter
+
+def self_play(model):
+    board = np.zeros(9)
+    memory = []
+    player = 1
+
+    for _ in range(9):
+        state = board*-1
+        probs = model.model(tensorflow.expand_dims(state, 0))[0].numpy() #generate myself a number
+
+        probs[board != 0] = 0
+        probs /= probs.sum()
+
+        action = np.random.choice(9, p=probs)
+        memory.append((state, action, player))
+
+        board[action] = player
+        winner = check_winner(board)
+
+        if winner != 0 or np.all(board != 0):
+            return memory, winner #memory is the winning players move
+                                    # by playing itself and getting all the winners the db is much larger
+
+        player = player*-1
+    return 0,0
+
+def training(model):
+    for i in range(1000):
+        print(i)
+        memory,winner=self_play(model)
+        if winner!=0:
+            model.adjust_model(memory,winner)
 
