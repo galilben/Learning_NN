@@ -20,24 +20,19 @@ class model_tic_tac_toe:
               metrics=['accuracy'])
     
     
-    def grad(self,model, inputs,result, punish=0):
+    def grad(self,model, inputs,result):
         with tensorflow.GradientTape() as tape:
             loss = 0
             for state, action, player in inputs:
-
-                reward = result * player
-                if punish!=0 and player==-1:
-                    reward*=-1
-                probs = model(tensorflow.expand_dims(state, 0))
-                log_prob = tensorflow.math.log(probs[0, action] + 1e-8)
-                loss += -reward * log_prob
+                if(player==result):
+                    reward = result * player
+                    probs = model(tensorflow.expand_dims(state, 0))
+                    log_prob = tensorflow.math.log(probs[0, action] + 1e-8)
+                    loss += -reward * log_prob
             return tape.gradient(loss, model.trainable_variables)
     
     def adjust_model(self,memory,winner):
         grads = self.grad(self.model, memory,winner)
-        self.optimizer.apply_gradients(zip(grads,self.model.trainable_variables))
-    def adjust_loss(self,memory,winner):
-        grads = self.grad(self.model, memory,winner,1)
         self.optimizer.apply_gradients(zip(grads,self.model.trainable_variables))
 
     def ai_move(self,board):

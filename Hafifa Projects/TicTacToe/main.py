@@ -48,7 +48,7 @@ def play(model):
                     moves.append((board,choise,1))
                     if(check_winner(board)!=0):
                         print(f"You win!!")
-                        model.adjust_loss(moves,1) #real time learn from games
+                        model.adjust_model(moves,1) #real time learn from games
                         moves=[]
                         board=np.zeros(9)
                     elif(np.all(board!=0)):

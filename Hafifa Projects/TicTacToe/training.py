@@ -42,7 +42,7 @@ def self_play(model):
     return 0,0
 
 def training(model):
-    for i in range(1000):
+    for i in range(5000):
         print(i)
         memory,winner=self_play(model)
         if winner!=0:
