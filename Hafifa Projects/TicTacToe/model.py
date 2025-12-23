@@ -4,15 +4,13 @@ import numpy as np
 from GameFunctions import *
 class model_tic_tac_toe:
     def __init__(self):
-        #basic loss function?
         self.loss_fn=keras.losses.SparseCategoricalCrossentropy(from_logits=True)
         self.optimizer=keras.optimizers.Adam()
-        #passing with 2 hiddens? 64 8*8 which is the number of max options squered
         self.model = keras.Sequential([
-            keras.layers.Input(shape=(9,)),  #9 inputs -> 1 for each space
-            keras.layers.Dense(64, activation='relu'), #64 hidden layers-> 
-            keras.layers.Dense(64, activation='relu'), #second hidden layer
-            keras.layers.Dense(9, activation='softmax') # 9 output options to show the odds of each move
+            keras.layers.Input(shape=(9,)), 
+            keras.layers.Dense(64, activation='relu'), 
+            keras.layers.Dense(64, activation='relu'), 
+            keras.layers.Dense(9, activation='softmax')
         ])
         
         self.model.compile(optimizer='adam',
@@ -38,10 +36,7 @@ class model_tic_tac_toe:
     def ai_move(self,board):
         board = board.astype(np.float32)
         probs = self.model(tensorflow.expand_dims(board, axis=0))[0].numpy()
-
-        # mask illegal moves
         probs[board != 0] = 0
-
         if probs.sum() == 0:
             return random_move(board)
 

@@ -14,7 +14,8 @@ def train_with_random_game():
         if check_winner(board):
             return boards_seen, moves, player
         player =player^1^2
-    return 0,0,0 #in case of draw doesnt matter
+    return 0,0,0    #in case of draw doesnt matter
+
 
 def self_play(model):
     board = np.zeros(9)
@@ -23,20 +24,15 @@ def self_play(model):
 
     for _ in range(9):
         state = board*-1
-        probs = model.model(tensorflow.expand_dims(state, 0))[0].numpy() #generate myself a number
-
+        probs = model.model(tensorflow.expand_dims(state, 0))[0].numpy() 
         probs[board != 0] = 0
         probs /= probs.sum()
-
         action = np.random.choice(9, p=probs)
         memory.append((state, action, player))
-
         board[action] = player
         winner = check_winner(board)
-
         if winner != 0 or np.all(board != 0):
-            return memory, winner #memory is the winning players move
-                                    # by playing itself and getting all the winners the db is much larger
+            return memory, winner
 
         player = player*-1
     return 0,0
