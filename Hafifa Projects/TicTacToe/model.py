@@ -3,7 +3,9 @@ from tensorflow import keras
 import numpy as np
 from GameFunctions import *
 class model_tic_tac_toe:
-    def __init__(self):
+    def __init__(self,model=None):
+        if model!=None:
+            self.model=model
         self.loss_fn=keras.losses.SparseCategoricalCrossentropy(from_logits=True)
         self.optimizer=keras.optimizers.Adam()
         self.model = keras.Sequential([
@@ -12,12 +14,12 @@ class model_tic_tac_toe:
             keras.layers.Dense(64, activation='relu'), 
             keras.layers.Dense(9, activation='softmax')
         ])
+
         
         self.model.compile(optimizer='adam',
               loss='categorical_crossentropy',
               metrics=['accuracy'])
-    
-    
+
     def grad(self,model, inputs,result):
         with tensorflow.GradientTape() as tape:
             loss = 0

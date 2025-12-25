@@ -4,6 +4,10 @@ from tensorflow import keras
 import numpy as np
 from training import *
 from model import *
+import os
+import pickle
+
+model_path="./model.bin"
 
 #create a data set of games-> save all winning games only to calculate in network best winning not drawing moves
 def Get_db():
@@ -66,9 +70,14 @@ def play(model):
                             moves=[]
             else:
                 print("choises 0->9 or bye")
+    pickle.dump(model.model,model_path) #will cause ovefeed eventually
 
-
-model=model_tic_tac_toe()
-training(model=model)
+if(os.path.exists(model_path)):
+    trained_model=pickle.load(model_path)
+    model=model_tic_tac_toe(trained_model)
+else:
+    model=model_tic_tac_toe()
+    training(model=model)
+    pickle.dump(model.model,model_path)
 play(model)
 
